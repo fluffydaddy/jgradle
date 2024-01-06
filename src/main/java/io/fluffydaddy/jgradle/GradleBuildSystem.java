@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package io.fluffydaddy.jgradle.system;
+package io.fluffydaddy.jgradle;
 
 import io.fluffydaddy.jbuildsystem.build.BuildListener;
 import io.fluffydaddy.jbuildsystem.build.BuildSystem;
-import io.fluffydaddy.jgradle.Gradle;
 import io.fluffydaddy.jhelper.files.FileHandle;
 import io.fluffydaddy.jutils.collection.Unit;
 import io.fluffydaddy.reactive.impl.Subscriber;
@@ -47,22 +46,38 @@ public class GradleBuildSystem<R> extends Subscriber<BuildListener<R>> implement
         return "Gradle";
     }
     
+    /*
+     * @return The build daemon is activated.
+     */
+    //boolean isAlive();
+    
     /**
-     * Installs the build system in {@code userHome} using the project configuration in {@code
-     * projectDir}.
+     * Installs the build system using the project configuration.
      *
-     * @param userHome   The user's home directory.
-     * @param projectDir The path to the project directory.
      * @return The path to the installed build system.
      */
     @Override
-    public FileHandle install(FileHandle userHome, FileHandle projectDir) {
+    public FileHandle install() {
         try {
-            return new FileHandle(_gradle.setGradle(userHome, projectDir).install());
+            return new FileHandle(_gradle.install());
         } catch (Exception e) {
             forEach((Unit<BuildListener<R>>) it -> it.buildFailure(GradleBuildSystem.this, e));
             return new FileHandle(_gradle.getGradleHome());
         }
+    }
+    
+    /**
+     * Use config on the build system in {@code userHome} using the project configuration in {@code
+     * projectDir}.
+     *
+     * @param userHome   The user's home directory.
+     * @param projectDir The path to the project directory.
+     * @return Return the current build system.
+     */
+    @Override
+    public GradleBuildSystem<R> useBuildSystem(FileHandle userHome, FileHandle projectDir) {
+        _gradle.setGradle(userHome, projectDir);
+        return this;
     }
     
     /**
@@ -72,7 +87,7 @@ public class GradleBuildSystem<R> extends Subscriber<BuildListener<R>> implement
      * @return Returns the current build system.
      */
     @Override
-    public BuildSystem<R> useBuildListener(BuildListener<R> buildListener) {
+    public GradleBuildSystem<R> useBuildListener(BuildListener<R> buildListener) {
         subscribe(buildListener);
         return this;
     }
@@ -84,8 +99,13 @@ public class GradleBuildSystem<R> extends Subscriber<BuildListener<R>> implement
      * @return Returns the current build system.
      */
     @Override
-    public BuildSystem<R> execute(String... args) throws Exception {
-        _gradle.execute(args);
+    public GradleBuildSystem<R> execute(String... args) {
+        try {
+            _gradle.execute(args);
+        } catch (Exception e) {
+            forEach((Unit<BuildListener<R>>) it -> it.buildFailure(GradleBuildSystem.this, e));
+        }
+        
         return this;
     }
 }

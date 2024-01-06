@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package io.fluffydaddy.jgradle.wrapper;
+package io.fluffydaddy.jgradle;
 
-import io.fluffydaddy.jbuildsystem.build.BuildSystem;
 import io.fluffydaddy.jbuildsystem.build.BuildWrapper;
-import io.fluffydaddy.jgradle.system.GradleBuildSystem;
 import io.fluffydaddy.jhelper.files.FileHandle;
 import org.gradle.wrapper.BootstrapMainStarter;
 
@@ -34,8 +32,10 @@ public abstract class GradleBuildWrapper<R> implements BuildWrapper<R> {
      */
     @Override
     public GradleBuildSystem<R> connect(File userHome, File projectDir) {
-        GradleBuildSystem<R> gradleBuildSystem = new GradleBuildSystem<>(createBootstrapMainStarter());
-        gradleBuildSystem.install(new FileHandle(userHome), new FileHandle(projectDir));
+        FileHandle userDir = new FileHandle(userHome);
+        FileHandle project = new FileHandle(projectDir);
+        GradleBuildSystem<R> gradleBuildSystem = new GradleBuildSystem<>(createBootstrapMainStarter(project));
+        gradleBuildSystem.useBuildSystem(userDir, project);
         return gradleBuildSystem;
     }
     
@@ -47,9 +47,11 @@ public abstract class GradleBuildWrapper<R> implements BuildWrapper<R> {
      * @return A new instance of the BuildSystem class.
      */
     @Override
-    public BuildSystem<R> connect(String userHome, String projectDir) {
-        GradleBuildSystem<R> gradleBuildSystem = new GradleBuildSystem<>(createBootstrapMainStarter());
-        gradleBuildSystem.install(new FileHandle(userHome), new FileHandle(projectDir));
+    public GradleBuildSystem<R> connect(String userHome, String projectDir) {
+        FileHandle userDir = new FileHandle(userHome);
+        FileHandle project = new FileHandle(projectDir);
+        GradleBuildSystem<R> gradleBuildSystem = new GradleBuildSystem<>(createBootstrapMainStarter(project));
+        gradleBuildSystem.useBuildSystem(userDir, project);
         return gradleBuildSystem;
     }
     
@@ -61,11 +63,11 @@ public abstract class GradleBuildWrapper<R> implements BuildWrapper<R> {
      * @return A new instance of the BuildSystem class.
      */
     @Override
-    public BuildSystem<R> connect(FileHandle userHome, FileHandle projectDir) {
-        GradleBuildSystem<R> gradleBuildSystem = new GradleBuildSystem<>(createBootstrapMainStarter());
-        gradleBuildSystem.install(userHome, projectDir);
+    public GradleBuildSystem<R> connect(FileHandle userHome, FileHandle projectDir) {
+        GradleBuildSystem<R> gradleBuildSystem = new GradleBuildSystem<>(createBootstrapMainStarter(projectDir));
+        gradleBuildSystem.useBuildSystem(userHome, projectDir);
         return gradleBuildSystem;
     }
     
-    public abstract BootstrapMainStarter createBootstrapMainStarter();
+    public abstract BootstrapMainStarter createBootstrapMainStarter(FileHandle projectDir);
 }

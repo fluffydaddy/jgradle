@@ -7,6 +7,7 @@
     <groupId>io.github.fluffydaddy</groupId>
     <artifactId>jgradle</artifactId>
     <version>1.0.0</version>
+    <name>Java Gradle</name>
 
     <properties>
         <maven.compiler.source>9</maven.compiler.source>
@@ -45,7 +46,6 @@
             <groupId>io.github.fluffydaddy</groupId>
             <artifactId>jutils</artifactId>
             <version>1.0.3</version>
-            <type>jar</type>
         </dependency>
 
         <dependency>
