@@ -20,14 +20,27 @@ import io.fluffydaddy.jbuildsystem.build.BuildListener;
 import io.fluffydaddy.jbuildsystem.build.BuildSystem;
 import io.fluffydaddy.jhelper.files.FileHandle;
 import io.fluffydaddy.jutils.collection.Unit;
+import io.fluffydaddy.reactive.DataSubscriber;
 import io.fluffydaddy.reactive.impl.Subscriber;
 import org.gradle.wrapper.BootstrapMainStarter;
 
-public class GradleBuildSystem<R> extends Subscriber<BuildListener<R>> implements BuildSystem<R> {
+import java.net.URI;
+
+public class GradleBuildSystem<R> extends Subscriber<BuildListener<R>> implements BuildSystem<R>, GradleWrapperListener {
     private final Gradle _gradle;
     
-    public GradleBuildSystem(BootstrapMainStarter starter) {
-        _gradle = Gradle.create(starter);
+    private final DataSubscriber<GradleWrapperListener> _wrapperObservers;
+    
+    protected GradleBuildSystem(Gradle gradle, DataSubscriber<GradleWrapperListener> wrapperObservers) {
+        _gradle = gradle;
+        _wrapperObservers = wrapperObservers;
+        _gradle.subscribe(this);
+    }
+    
+    public GradleBuildSystem(boolean hasLogs, BootstrapMainStarter starter, DataSubscriber<GradleWrapperListener> wrapperObservers) {
+        _gradle = Gradle.create(hasLogs, starter);
+        _wrapperObservers = wrapperObservers;
+        _gradle.subscribe(this);
     }
     
     /**
@@ -62,7 +75,7 @@ public class GradleBuildSystem<R> extends Subscriber<BuildListener<R>> implement
             return new FileHandle(_gradle.install());
         } catch (Exception e) {
             forEach((Unit<BuildListener<R>>) it -> it.buildFailure(GradleBuildSystem.this, e));
-            return new FileHandle(_gradle.getGradleHome());
+            return null;
         }
     }
     
@@ -99,13 +112,18 @@ public class GradleBuildSystem<R> extends Subscriber<BuildListener<R>> implement
      * @return Returns the current build system.
      */
     @Override
-    public GradleBuildSystem<R> execute(String... args) {
-        try {
-            _gradle.execute(args);
-        } catch (Exception e) {
-            forEach((Unit<BuildListener<R>>) it -> it.buildFailure(GradleBuildSystem.this, e));
-        }
-        
-        return this;
+    public R execute(String... args) throws Exception {
+        _gradle.execute(args);
+        return null;
+    }
+    
+    @Override
+    public void onDownload(URI address, long contentLength, int progress) {
+        _wrapperObservers.forEach((Unit<GradleWrapperListener>) it -> it.onDownload(address, contentLength, progress));
+    }
+    
+    @Override
+    public void onFinished(URI address, long contentLength, long downloaded) {
+        _wrapperObservers.forEach((Unit<GradleWrapperListener>) it -> it.onFinished(address, contentLength, downloaded));
     }
 }

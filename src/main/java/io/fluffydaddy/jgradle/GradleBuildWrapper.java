@@ -18,11 +18,12 @@ package io.fluffydaddy.jgradle;
 
 import io.fluffydaddy.jbuildsystem.build.BuildWrapper;
 import io.fluffydaddy.jhelper.files.FileHandle;
+import io.fluffydaddy.reactive.impl.Subscriber;
 import org.gradle.wrapper.BootstrapMainStarter;
 
 import java.io.File;
 
-public abstract class GradleBuildWrapper<R> implements BuildWrapper<R> {
+public abstract class GradleBuildWrapper<R> extends Subscriber<GradleWrapperListener> implements BuildWrapper<R> {
     /**
      * Connects to the build system.
      *
@@ -34,7 +35,7 @@ public abstract class GradleBuildWrapper<R> implements BuildWrapper<R> {
     public GradleBuildSystem<R> connect(File userHome, File projectDir) {
         FileHandle userDir = new FileHandle(userHome);
         FileHandle project = new FileHandle(projectDir);
-        GradleBuildSystem<R> gradleBuildSystem = new GradleBuildSystem<>(createBootstrapMainStarter(project));
+        GradleBuildSystem<R> gradleBuildSystem = new GradleBuildSystem<>(hasLogging(), createBootstrapMainStarter(project), this);
         gradleBuildSystem.useBuildSystem(userDir, project);
         return gradleBuildSystem;
     }
@@ -50,7 +51,7 @@ public abstract class GradleBuildWrapper<R> implements BuildWrapper<R> {
     public GradleBuildSystem<R> connect(String userHome, String projectDir) {
         FileHandle userDir = new FileHandle(userHome);
         FileHandle project = new FileHandle(projectDir);
-        GradleBuildSystem<R> gradleBuildSystem = new GradleBuildSystem<>(createBootstrapMainStarter(project));
+        GradleBuildSystem<R> gradleBuildSystem = new GradleBuildSystem<>(hasLogging(), createBootstrapMainStarter(project), this);
         gradleBuildSystem.useBuildSystem(userDir, project);
         return gradleBuildSystem;
     }
@@ -64,10 +65,12 @@ public abstract class GradleBuildWrapper<R> implements BuildWrapper<R> {
      */
     @Override
     public GradleBuildSystem<R> connect(FileHandle userHome, FileHandle projectDir) {
-        GradleBuildSystem<R> gradleBuildSystem = new GradleBuildSystem<>(createBootstrapMainStarter(projectDir));
+        GradleBuildSystem<R> gradleBuildSystem = new GradleBuildSystem<>(hasLogging(), createBootstrapMainStarter(projectDir), this);
         gradleBuildSystem.useBuildSystem(userHome, projectDir);
         return gradleBuildSystem;
     }
     
     public abstract BootstrapMainStarter createBootstrapMainStarter(FileHandle projectDir);
+    
+    public abstract boolean hasLogging();
 }

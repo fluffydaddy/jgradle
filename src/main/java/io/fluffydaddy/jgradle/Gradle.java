@@ -50,8 +50,8 @@ public final class Gradle extends Subscriber<GradleWrapperListener> implements D
         return file;
     }
     
-    public static synchronized Gradle create(BootstrapMainStarter starter) {
-        return new Gradle("gradlew", Download.UNKNOWN_VERSION, starter);
+    public static synchronized Gradle create(boolean hasLogs, BootstrapMainStarter starter) {
+        return new Gradle("gradlew", Download.UNKNOWN_VERSION, hasLogs, starter);
     }
     
     private static Map<String, String> convertSystemProperties(Properties properties) {
@@ -69,13 +69,12 @@ public final class Gradle extends Subscriber<GradleWrapperListener> implements D
     private Install _install;
     private PathAssembler _assembler;
     private WrapperExecutor _executor;
-    private File _gradleHome;
     private File _gradleUserHome;
     private File _projectDirectory;
     
-    private Gradle(String appName, String appVersion, BootstrapMainStarter starter) {
+    private Gradle(String appName, String appVersion, boolean hasLogs, BootstrapMainStarter starter) {
         _starter = starter;
-        _logger = new Logger(false);
+        _logger = new Logger(!hasLogs);
         _download = new Download(_logger, this, appName, appVersion, convertSystemProperties(System.getProperties()));
     }
     
@@ -96,16 +95,16 @@ public final class Gradle extends Subscriber<GradleWrapperListener> implements D
         return setGradle(gradleUserHome.file(), projectDirectory.file());
     }
     
-    public File getGradleHome() {
-        return _gradleHome;
-    }
-    
     public File getGradleUserHome() {
         return _gradleUserHome;
     }
     
     public File getProjectDirectory() {
         return _projectDirectory;
+    }
+    
+    public PathAssembler getPathAssembler() {
+        return _assembler;
     }
     
     @Override
