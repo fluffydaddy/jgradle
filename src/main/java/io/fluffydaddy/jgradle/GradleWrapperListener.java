@@ -16,8 +16,8 @@
 
 package io.fluffydaddy.jgradle;
 
-import io.fluffydaddy.annotation.MainThread;
-import io.fluffydaddy.annotation.WorkerThread;
+import io.fluffydaddy.jutils.annotation.MainThread;
+import io.fluffydaddy.jutils.annotation.WorkerThread;
 
 import java.net.URI;
 

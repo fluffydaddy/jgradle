@@ -20,8 +20,8 @@ import io.fluffydaddy.jbuildsystem.build.BuildListener;
 import io.fluffydaddy.jbuildsystem.build.BuildSystem;
 import io.fluffydaddy.jhelper.files.FileHandle;
 import io.fluffydaddy.jutils.collection.Unit;
-import io.fluffydaddy.reactive.DataSubscriber;
-import io.fluffydaddy.reactive.impl.Subscriber;
+import io.fluffydaddy.jreactive.DataSubscriber;
+import io.fluffydaddy.jreactive.impl.Subscriber;
 import org.gradle.wrapper.BootstrapMainStarter;
 
 import java.net.URI;

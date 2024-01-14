@@ -6,7 +6,7 @@
 
     <groupId>io.github.fluffydaddy</groupId>
     <artifactId>jgradle</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>Java Gradle</name>
 
     <properties>
@@ -31,11 +31,6 @@
         </repository>
 
         <repository>
-            <id>gradle-local</id>
-            <url>https://repo.gradle.org/gradle/libs-releases-local</url>
-        </repository>
-
-        <repository>
             <id>gradle-releases</id>
             <url>https://repo.gradle.org/gradle/libs-releases</url>
         </repository>
@@ -45,30 +40,51 @@
         <dependency>
             <groupId>io.github.fluffydaddy</groupId>
             <artifactId>jutils</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jetbrains</groupId>
+                    <artifactId>annotations</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>io.github.fluffydaddy</groupId>
             <artifactId>jtasks</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.3</version>
         </dependency>
 
         <dependency>
             <groupId>org.gradle</groupId>
             <artifactId>gradle-tooling-api</artifactId>
             <version>7.4.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
+        <!--<dependency>
+            <groupId>org.gradle</groupId>
+            <artifactId>wrapper</artifactId>
+            <version>7.4.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/gradle-wrapper.jar</systemPath>
+        </dependency>-->
 
         <dependency>
             <groupId>io.github.fluffydaddy</groupId>
             <artifactId>jhelper</artifactId>
             <version>1.0.0</version>
         </dependency>
+
         <dependency>
             <groupId>io.github.fluffydaddy</groupId>
             <artifactId>jbuildsystem</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
 
@@ -112,21 +128,8 @@
         </repository>
     </distributionManagement>
 
-    <profiles>
-        <!-- GPG Signature on release -->
-        <profile>
-            <id>release-sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-        </profile>
-    </profiles>
-
     <build>
-        <defaultGoal>install</defaultGoal>
+        <defaultGoal>package</defaultGoal>
         <resources>
             <resource>
                 <directory>${project.basedir}</directory>

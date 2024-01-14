@@ -18,7 +18,7 @@ package io.fluffydaddy.jgradle;
 
 import io.fluffydaddy.jbuildsystem.build.BuildWrapper;
 import io.fluffydaddy.jhelper.files.FileHandle;
-import io.fluffydaddy.reactive.impl.Subscriber;
+import io.fluffydaddy.jreactive.impl.Subscriber;
 import org.gradle.wrapper.BootstrapMainStarter;
 
 import java.io.File;
